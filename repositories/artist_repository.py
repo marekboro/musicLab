@@ -1,15 +1,18 @@
 from db.run_sql import run_sql
 from models.artist import Artist
 from models.album import Album
+import repositories.album_repository as album_repository 
 
 
 def save(artist):
-    sql = "INSERT INTO artists (name) VALUES (%s) RETURNING *"
+    sql = "INSERT INTO artists (name) VALUES (%s) RETURNING *"  # name and %s  NEED TO BE IN ()
     values = [artist.name]
     results = run_sql(sql, values)
     id = results[0]["id"]
     artist.id = id
     return artist
+
+
 
 def select_all():
     artists = []
@@ -35,19 +38,13 @@ def select(id):
 
 
 
-
-
-
-
-def tasks(user): # Get ALL tasks associated with one user
-    tasks = []
-
-    sql = "SELECT * FROM tasks WHERE user_id = %s"
-    values = [user.id]    
-    
-    results = run_sql(sql, values)
+def all_albums(artist):
+    albums = []
+    sql = "SELECT * FROM albums WHERE artist_id = %s"
+    values = [artist.id]
+    results = run_sql(sql,values)
     for row in results:
-        task = Task(row['description'],user, row['duration'],row['completed'],row['id'])
-        tasks.append(task)
+        album = Album(row['name'],row['genre'],artist, row['id'])
+        albums.append(album)
+    return albums
 
-    return tasks
